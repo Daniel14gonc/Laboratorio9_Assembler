@@ -14,7 +14,10 @@ comando: .asciz "Ingrese un comando: "
 salto: .asciz " \n"
 receptor: .asciz "                          "
 receptor1: .asciz "                          "
-actual: .word 0
+format: .asciz "%d \n"
+msgerror: .asciz "Ha ingresado un dato invalido\n"
+actual: .word 10
+strNumVal: .word 0
 
 .text
 .global main
@@ -57,12 +60,32 @@ main:
         beq salida 
         
         cmp r0, #'+'
+        moveq r11,#1
 
         ldr r1, =msg1
-        bl _print
+        bleq _print
 
         ldr r0, =receptor
-        bl _keybread
+        bleq _keybread
+
+        ldr r0,=receptor
+        ldr r1,=strNumVal
+        bleq _char2Num
+        
+        ldr r0,=actual
+        ldr r0,[r0]
+        ldr r1,=strNumVal
+        ldr r1,[r1]
+        ldr r2,=actual
+        bleq _suma
+
+        LDR R1,=actual
+        ldr R1,[R1]
+        ldr r0,=format
+        bleq printf
+        
+        ldrne R1,=msgerror
+        blne _print
 
         ldr r1, =salto
         bl _print
