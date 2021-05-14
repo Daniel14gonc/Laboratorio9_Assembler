@@ -7,22 +7,27 @@ numFinal: .word 0
 potencia: .word 0
 temporal: .word 0
 string: .asciz "                   "
+mensaje: .asciz "siuuuuuuuu\n"
 
 .text
 .align 2
 
 .global _convertirNumero
 _convertirNumero:
+    ldr r5, =numFinal
+    mov r6, #0
+    str r6, [r5]
+
+    mrs r11,CPSR
+    PUSH {r11}
     PUSH {LR}
 
-    numPointer .req r8
-    store .req r9
-    flag .req r10
+    numPointer .req r8 //Numero
+    store .req r9 //Place to store
+    flag .req r10 //Flag
     size .req r5
 
     mov numPointer, r0
-    mov r0, numPointer
-    bl puts
     mov store, r1
     mov flag, r2
 
@@ -31,7 +36,7 @@ _convertirNumero:
 
     countLoop:
         ldrb r6, [r7], #1
-        cmp r6, #' '
+        cmp r6, #32
         beq continue
         cmp r6, #'\n'
         beq continue
@@ -70,10 +75,20 @@ endLoop:
 
     ldr r1, =numFinal
     ldr r1, [r1]
-    ldr r0, =format
-    bl printf
+    str r1, [store]
+    /*ldr r0, =format
+    bl printf*/
+
+    .unreq numPointer
+    .unreq store
+    .unreq flag
+    .unreq size
 
     POP {LR}
+
+    POP {r11}
+
+    MSR CPSR,r11
 
     BX LR
 
@@ -118,3 +133,56 @@ _pot10:
     str r0, [r2]
     BX LR
 
+
+.global _concatenar
+_concatenar:
+    mrs r11,CPSR
+
+    string1 .req r5
+    string2 .req r6
+    store .req r7
+
+    mov string1, r0
+    mov string2, r1
+    mov store, r2
+
+    concatenar1:
+        ldrb r3, [string1], #1
+
+        cmp r3, #32
+        beq end1
+
+       cmp r3, #'\n'
+       beq end1
+
+        strb r3, [store], #1
+
+        b concatenar1
+
+    end1:
+    mov r0, #' '
+    strb r0, [store], #1
+    //bl puts
+
+    concatenar2:
+        ldrb r3, [string2], #1
+
+        cmp r3, #32
+        beq end2
+
+        cmp r3, #'\n'
+        beq end2
+
+        strb r3, [store], #1
+
+        b concatenar2
+    
+    end2:
+
+    .unreq string1
+    .unreq string2
+    .unreq store
+
+    MSR CPSR,r11
+
+    BX LR

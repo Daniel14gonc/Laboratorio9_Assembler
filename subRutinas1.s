@@ -8,7 +8,6 @@ strLen4print: .word 0
 
 .global _keybread
 _keybread:
-
 @ Lee el caracter
   MOV R1,R0     @copia el parametro del puntero a la cadena
   MOV R7, #3		@3=llamado a "read" swi
