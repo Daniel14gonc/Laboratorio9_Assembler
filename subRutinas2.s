@@ -64,6 +64,14 @@ continue:
         bl _char2Num
 
         ldr r0, =conversion
+        ldr r0, [r0]
+        mvn r1, #1
+        cmp r1, r0
+        mov r1, #'a'
+        streqb r1, [flag]
+        bleq final
+
+        ldr r0, =conversion
         mov r1, size
         bl _multip10
 
@@ -79,6 +87,8 @@ endLoop:
     /*ldr r0, =format
     bl printf*/
 
+
+final:
     .unreq numPointer
     .unreq store
     .unreq flag
@@ -152,8 +162,8 @@ _concatenar:
         cmp r3, #32
         beq end1
 
-       cmp r3, #'\n'
-       beq end1
+        cmp r3, #'\n'
+        beq end1
 
         strb r3, [store], #1
 
@@ -178,6 +188,8 @@ _concatenar:
         b concatenar2
     
     end2:
+    mov r3, #'\n'
+    streqb r3, [store], #1
 
     .unreq string1
     .unreq string2

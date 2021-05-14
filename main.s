@@ -19,7 +19,8 @@ receptor1: .asciz "                          "
 receptor3: .asciz "                          "
 format: .asciz ">> %d \n"
 msgerror: .asciz "Ha ingresado un dato invalido\n"
-flagM: .word 0
+prev: .asciz "Concatenacion:\n"
+flagM: .asciz "b"
 actual: .word 0
 strNumVal: .word 0
 string1: .asciz "                               "
@@ -35,6 +36,11 @@ opActual: .asciz " "
 main:
 
     loop:
+
+        mov r1, #'b'
+        ldr r0, =flagM
+        strb r1, [r0]
+
         //Muestra de menu
         ldr r1, =suma
         bl _print
@@ -46,6 +52,9 @@ main:
         bl _print
 
         ldr r1, =potencia
+        bl _print
+
+        ldr r1, =resultado
         bl _print
 
         ldr r1, =primera
@@ -95,8 +104,6 @@ main:
         beq loopcontinue
 
 
-        //ldr r0, =opActual
-        //ldrb r0, [r0]
         //1 de strings
         cmp r0, #'1'
 
@@ -106,6 +113,7 @@ main:
         ldreq r0, =string1
         bleq _keybread
         beq loopcontinue
+
         //2 de strings
         cmp r0, #'2'
 
@@ -116,16 +124,19 @@ main:
         bleq _keybread
         beq loopcontinue
 
-        cmpne r0, #'C'
+        //Ingreso de 'C'
+
+        cmp r0, #'C'
         ldreq r0, =string1
         ldreq r1, =string2
         ldreq r2, =res
         bleq _concatenar
 
-        //ldreq r0, =format3
-        //bl puts
-        ldreq r0, =res
-        bleq puts
+        ldreq r1, =prev
+        bleq _print
+
+        ldreq r1, =res
+        bleq _print
 
         beq loopcontinue
 
@@ -158,9 +169,7 @@ solicitudValoresNumericos:
     ldr r1, =strNumVal
     ldr r2, =flagM
     bl _convertirNumero
-    //ldr r0,=receptor
-    //ldr r1,=strNumVal
-    //bl _char2Num
+
     POP {LR}
     POP {R11}
     MSR CPSR,r11
@@ -171,6 +180,15 @@ Suma:
     PUSH {r11}
     PUSH {LR}
     bl solicitudValoresNumericos
+
+    ldr r0, =flagM
+    ldrb r0, [r0]
+    mov r1, #'a'
+    cmp r1, r0
+    ldreq r1, =msgerror
+    bleq _print
+    beq finSuma
+
     ldr r0,=actual
     ldr r0,[r0]
     ldr r1,=strNumVal
@@ -182,6 +200,8 @@ Suma:
     ldr R1,[R1]
     ldr r0,=format
     bl printf
+
+    finSuma:
     POP {LR}
     POP {R11}
     MSR CPSR,r11
@@ -192,6 +212,15 @@ Multiplicacion:
     PUSH {r11}
     PUSH {LR}
     bl solicitudValoresNumericos
+
+    ldr r0, =flagM
+    ldrb r0, [r0]
+    mov r1, #'a'
+    cmp r1, r0
+    ldreq r1, =msgerror
+    bleq _print
+    beq finMultiplacion
+
     ldr r0,=actual
     ldr r0,[r0]
     ldr r1,=strNumVal
@@ -203,6 +232,8 @@ Multiplicacion:
     ldr R1,[R1]
     ldr r0,=format
     bl printf
+
+    finMultiplacion:
     POP {LR}
     POP {R11}
     MSR CPSR,r11
@@ -213,6 +244,15 @@ Modulo:
     PUSH {r11}
     PUSH {LR}
     bl solicitudValoresNumericos
+
+    ldr r0, =flagM
+    ldrb r0, [r0]
+    mov r1, #'a'
+    cmp r1, r0
+    ldreq r1, =msgerror
+    bleq _print
+    beq finModulo
+
     ldr r0,=actual
     ldr r0,[r0]
     ldr r1,=strNumVal
@@ -224,6 +264,8 @@ Modulo:
     ldr R1,[R1]
     ldr r0,=format
     bl printf
+
+    finModulo:
     POP {LR}
     POP {R11}
     MSR CPSR,r11
@@ -234,6 +276,15 @@ Potencia:
     PUSH {r11}
     PUSH {LR}
     bl solicitudValoresNumericos
+
+    ldr r0, =flagM
+    ldrb r0, [r0]
+    mov r1, #'a'
+    cmp r1, r0
+    ldreq r1, =msgerror
+    bleq _print
+    beq finPotencia
+
     ldr r0,=actual
     ldr r0,[r0]
     ldr r1,=strNumVal
@@ -245,6 +296,8 @@ Potencia:
     ldr R1,[R1]
     ldr r0,=format
     bl printf
+
+    finPotencia:
     POP {LR}
     POP {R11}
     MSR CPSR,r11

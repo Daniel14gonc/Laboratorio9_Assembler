@@ -1,6 +1,7 @@
 .data
 .align 2
 strLen4print: .word 0
+bandera: .word -1
 
 
 .text
@@ -57,6 +58,9 @@ _char2Num:
   CMP R0,#0x30      @ Is the hex ascii value between 0
   CMPGE R0,#0x39    @ or 9
   SUBLE R0,#0x30    @ subtract 0x30 only if it's a digit
+  MVNGT R0, #1
+  STRGT R0, [valPointer]
+
   STRLE R0,[valPointer] @ store value only if it's a digit
   .unreq charPointer
   .unreq valPointer
