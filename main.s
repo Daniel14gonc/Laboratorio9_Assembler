@@ -16,7 +16,7 @@ receptor: .asciz "                          "
 receptor1: .asciz "                          "
 format: .asciz "%d \n"
 msgerror: .asciz "Ha ingresado un dato invalido\n"
-actual: .word 10
+actual: .word 5
 strNumVal: .word 0
 
 .text
@@ -77,7 +77,7 @@ main:
         ldr r1,=strNumVal
         ldr r1,[r1]
         ldr r2,=actual
-        bleq _suma
+        bleq _potencia
 
         LDR R1,=actual
         ldr R1,[R1]

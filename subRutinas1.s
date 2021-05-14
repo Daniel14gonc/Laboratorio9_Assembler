@@ -80,6 +80,7 @@ _suma:
 
 .global _multiplicacion
 _multiplicacion:
+  mrs r11,CPSR
   valor1 .req r0
   valor2 .req r1
   respuesta .req r2
@@ -98,42 +99,47 @@ _multiplicacion:
   .unreq respuesta
   .unreq pivote
   .unreq contador
+  MSR CPSR,r11
   BX LR
+
 
 .global _modulo
 _modulo:
+  mrs r11,CPSR
   valor1m .req r0
   valor2m .req r1
   respuestam .req r2
   loop1:
-    sub valor1m,valor2m
-    cmp valor2m,valor1m
+    sub valor1m,valor1m,valor2m
+    cmp valor1m,valor2m
     bge loop1
   str valor1m,[respuestam]
   .unreq valor1m
   .unreq valor2m
   .unreq respuestam
+  MSR CPSR,r11
   BX LR
+
 
 .global _potencia
 _potencia:
   PUSH {LR}
   valor1a .req r0
   exponente .req r9
-  respuestaa .req r3
+  respuestaa .req R2
   contadora .req R8
   mov exponente,r1
-  mov contadora,#0
+  mov contadora,#1
   mov r1,valor1a
   loop2:
-    bl Multiplicacion
+    bl _multiplicacion
     add contadora,#1
     cmp contadora,exponente
     blt loop2
-  str valor1a,[respuesta]
+  str valor1a,[respuestaa]
   .unreq respuestaa
   .unreq contadora
   .unreq valor1a
-  .unreq valor2a
   POP {LR}
   BX LR
+
