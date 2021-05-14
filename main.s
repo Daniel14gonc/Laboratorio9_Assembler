@@ -1,3 +1,10 @@
+/*
+ * Autores: Daniel Gonzalez 20293, Juan Carlos Bajan 20109
+ * Modificacion: 14/05/2021
+ * Descripcion: Programa que permite simular una calculadora con operaciones basicas.
+ */
+
+
 .data 
 .align 2
 suma: .asciz "+ Suma \n"
@@ -36,12 +43,12 @@ opActual: .asciz " "
 main:
 
     loop:
-
+        //Se modifica la bandera que indica si se ingreso un numero ascii o no.
         mov r1, #'b'
         ldr r0, =flagM
         strb r1, [r0]
 
-        //Muestra de menu
+        //Muestra de menu de opciones
         ldr r1, =suma
         bl _print
 
@@ -69,7 +76,7 @@ main:
         ldr r1, =salir
         bl _print
 
-        //Opcion elegida
+        //Se obtiene la pcion elegida y se almacena
         ldr r0, =receptor1
         bl _keybread
 
@@ -78,33 +85,37 @@ main:
         ldr r1, =opActual
         str r0, [r1]
 
-        //Salida
+        //Eleccion de salida por parte del usuario.
         cmp r0, #'q'
         beq salida 
         
-        //Suma
+        //Eleccion de suma.
         cmp r0, #'+'
         bleq Suma
         beq loopcontinue
 
+        //Eleccion de multiplicacion.
         cmp r0,#'*'
         bleq Multiplicacion
         beq loopcontinue
 
+        //Eleccion de igual.
         cmp r0,#'='
         bleq Igual
         beq loopcontinue
 
+        //Eleccion de modulo
         cmp r0,#'M'
         bleq Modulo
         beq loopcontinue
 
+        //Eleccion de potencia
         cmp r0,#'P'
         bleq Potencia
         beq loopcontinue
 
 
-        //1 de strings
+        //Ingreso y almacenamiento de primer string por concatenar.
         cmp r0, #'1'
 
         ldreq r1, =msg2
@@ -114,7 +125,7 @@ main:
         bleq _keybread
         beq loopcontinue
 
-        //2 de strings
+        //Ingreso y almacenamiento de segundo string por concatenar.
         cmp r0, #'2'
 
         ldreq r1, =msg3
@@ -124,14 +135,15 @@ main:
         bleq _keybread
         beq loopcontinue
 
-        //Ingreso de 'C'
+        //Ingreso de 'C' para mostrar los strings concatenados.
 
         cmp r0, #'C'
         ldreq r0, =string1
         ldreq r1, =string2
         ldreq r2, =res
-        bleq _concatenar
+        bleq _concatenar //Subrutina de concatenacion.
 
+        //Se imprime el resultado despues de concatenar.
         ldreq r1, =prev
         bleq _print
 
@@ -142,7 +154,7 @@ main:
 
         loopcontinue:
 
-
+        //Se imprime un mensaje de error en caso no se elija ninguna opcion correcta.
         ldrne R1,=msgerror
         blne _print
         
@@ -151,20 +163,29 @@ main:
 
         b loop
 
-
+    //Condiciones de salida
     salida:
     mov r7,#1
     swi 0
 
 
 solicitudValoresNumericos:
+    //Se solicitan los valores para operar al usuaario.
+
+    //Es necesario guardar el CPSR porque en el programa principal se utiliza.
     mrs r11,CPSR
     PUSH {r11}
     PUSH {LR}
+
+    //Se carga el mensaje que indica al usuario que ingrese el numero.
     ldr r1, =msg1
     bl _print
+
+    //Se almacena el mensaje ingresado.
     ldr r0, =receptor
     bl _keybread
+
+    //Se convierte el numero ingresado ascii a decimal.
     ldr r0, =receptor
     ldr r1, =strNumVal
     ldr r2, =flagM
@@ -176,11 +197,15 @@ solicitudValoresNumericos:
     bx LR
 
 Suma:
+    //Se almacena CPSR en stack porque se necesita en el programa principal.
     mrs r11,CPSR
     PUSH {r11}
     PUSH {LR}
+
+    //Se almacena el valor por operar.
     bl solicitudValoresNumericos
 
+    //Se verifica si el valor ascii no es un numero. En caso no sea, se levanta una bandera.
     ldr r0, =flagM
     ldrb r0, [r0]
     mov r1, #'a'
@@ -189,6 +214,7 @@ Suma:
     bleq _print
     beq finSuma
 
+    //Se suma el valor ingresado y el valor almacenado previo.
     ldr r0,=actual
     ldr r0,[r0]
     ldr r1,=strNumVal
@@ -196,6 +222,7 @@ Suma:
     ldr r2,=actual
     bl _suma
 
+    //Se guarda el valor operado y se imprime.
     ldr R1,=actual
     ldr R1,[R1]
     ldr r0,=format
@@ -211,8 +238,11 @@ Multiplicacion:
     mrs r11,CPSR
     PUSH {r11}
     PUSH {LR}
+
+     //Se almacena el valor por operar.
     bl solicitudValoresNumericos
 
+    //Se verifica si el valor ascii no es un numero. En caso no sea, se levanta una bandera.
     ldr r0, =flagM
     ldrb r0, [r0]
     mov r1, #'a'
@@ -221,6 +251,7 @@ Multiplicacion:
     bleq _print
     beq finMultiplacion
 
+    //Se multiplica el valor ingresado y el valor almacenado previo.
     ldr r0,=actual
     ldr r0,[r0]
     ldr r1,=strNumVal
@@ -228,6 +259,7 @@ Multiplicacion:
     ldr r2,=actual
     bl _multiplicacion
 
+    //Se guarda el valor operado y se imprime.
     ldr R1,=actual
     ldr R1,[R1]
     ldr r0,=format
@@ -243,8 +275,11 @@ Modulo:
     mrs r11,CPSR
     PUSH {r11}
     PUSH {LR}
+
+    //Se almacena el valor por operar.
     bl solicitudValoresNumericos
 
+    //Se verifica si el valor ascii no es un numero. En caso no sea, se levanta una bandera.
     ldr r0, =flagM
     ldrb r0, [r0]
     mov r1, #'a'
@@ -253,6 +288,7 @@ Modulo:
     bleq _print
     beq finModulo
 
+     //Se encuentra el modulo del valor ingresado y el valor almacenado previo.
     ldr r0,=actual
     ldr r0,[r0]
     ldr r1,=strNumVal
@@ -260,6 +296,7 @@ Modulo:
     ldr r2,=actual
     bl _modulo
 
+    //Se guarda el valor operado y se imprime.
     ldr R1,=actual
     ldr R1,[R1]
     ldr r0,=format
@@ -275,8 +312,11 @@ Potencia:
     mrs r11,CPSR
     PUSH {r11}
     PUSH {LR}
+
+    //Se almacena el valor por operar.
     bl solicitudValoresNumericos
 
+    //Se verifica si el valor ascii no es un numero. En caso no sea, se levanta una bandera.
     ldr r0, =flagM
     ldrb r0, [r0]
     mov r1, #'a'
@@ -285,6 +325,7 @@ Potencia:
     bleq _print
     beq finPotencia
 
+    //Se encuentra del valor actual con el valor ingresado como exponente.
     ldr r0,=actual
     ldr r0,[r0]
     ldr r1,=strNumVal
@@ -292,6 +333,7 @@ Potencia:
     ldr r2,=actual
     bl _potencia
 
+    //Se guarda el valor operado y se imprime.
     ldr R1,=actual
     ldr R1,[R1]
     ldr r0,=format
@@ -304,6 +346,7 @@ Potencia:
     bx LR
 
 Igual:
+    //Se imprime el valor actual.
     PUSH {LR}
     ldr r1,=actual
     ldr r1,[r1]
