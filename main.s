@@ -75,36 +75,28 @@ main:
         
         //Suma
         cmp r0, #'+'
+        bleq Suma
+        beq loopcontinue
 
-        ldreq r1, =msg1
-        bleq _print
+        cmp r0,#'*'
+        bleq Multiplicacion
+        beq loopcontinue
 
-        ldreq r0, =receptor
-        bleq _keybread
+        cmp r0,#'='
+        bleq Igual
+        beq loopcontinue
 
-        ldreq r0, =receptor
-        ldreq r1, =strNumVal
-        ldreq r2, =flagM
-        bleq _convertirNumero
+        cmp r0,#'M'
+        bleq Modulo
+        beq loopcontinue
 
-        ldreq r0,=receptor
-        ldreq r1,=strNumVal
-        bleq _char2Num
-        
-        ldreq r0,=actual
-        ldreq r0,[r0]
-        ldreq r1,=strNumVal
-        ldreq r1,[r1]
-        ldreq r2,=actual
-        bleq _suma
+        cmp r0,#'P'
+        bleq Potencia
+        beq loopcontinue
 
-        ldreq R1,=actual
-        ldreq R1,[R1]
-        ldreq r0,=format
-        bleq printf
 
-        ldr r0, =opActual
-        ldrb r0, [r0]
+        //ldr r0, =opActual
+        //ldrb r0, [r0]
         //1 de strings
         cmp r0, #'1'
 
@@ -113,7 +105,7 @@ main:
         
         ldreq r0, =string1
         bleq _keybread
-
+        beq loopcontinue
         //2 de strings
         cmp r0, #'2'
 
@@ -122,8 +114,9 @@ main:
 
         ldreq r0, =string2
         bleq _keybread
+        beq loopcontinue
 
-        cmp r0, #'C'
+        cmpne r0, #'C'
         ldreq r0, =string1
         ldreq r1, =string2
         ldreq r2, =res
@@ -131,14 +124,17 @@ main:
 
         //ldreq r0, =format3
         //bl puts
-
         ldreq r0, =res
         bleq puts
-        
-        
+
+        beq loopcontinue
+
+        loopcontinue:
+
+
         ldrne R1,=msgerror
         blne _print
-
+        
         ldr r1, =salto
         bl _print
 
@@ -149,3 +145,116 @@ main:
     mov r7,#1
     swi 0
 
+
+solicitudValoresNumericos:
+    mrs r11,CPSR
+    PUSH {r11}
+    PUSH {LR}
+    ldr r1, =msg1
+    bl _print
+    ldr r0, =receptor
+    bl _keybread
+    ldr r0, =receptor
+    ldr r1, =strNumVal
+    ldr r2, =flagM
+    bl _convertirNumero
+    //ldr r0,=receptor
+    //ldr r1,=strNumVal
+    //bl _char2Num
+    POP {LR}
+    POP {R11}
+    MSR CPSR,r11
+    bx LR
+
+Suma:
+    mrs r11,CPSR
+    PUSH {r11}
+    PUSH {LR}
+    bl solicitudValoresNumericos
+    ldr r0,=actual
+    ldr r0,[r0]
+    ldr r1,=strNumVal
+    ldr r1,[r1]
+    ldr r2,=actual
+    bl _suma
+
+    ldr R1,=actual
+    ldr R1,[R1]
+    ldr r0,=format
+    bl printf
+    POP {LR}
+    POP {R11}
+    MSR CPSR,r11
+    bx LR
+
+Multiplicacion:
+    mrs r11,CPSR
+    PUSH {r11}
+    PUSH {LR}
+    bl solicitudValoresNumericos
+    ldr r0,=actual
+    ldr r0,[r0]
+    ldr r1,=strNumVal
+    ldr r1,[r1]
+    ldr r2,=actual
+    bl _multiplicacion
+
+    ldr R1,=actual
+    ldr R1,[R1]
+    ldr r0,=format
+    bl printf
+    POP {LR}
+    POP {R11}
+    MSR CPSR,r11
+    bx LR
+
+Modulo:
+    mrs r11,CPSR
+    PUSH {r11}
+    PUSH {LR}
+    bl solicitudValoresNumericos
+    ldr r0,=actual
+    ldr r0,[r0]
+    ldr r1,=strNumVal
+    ldr r1,[r1]
+    ldr r2,=actual
+    bl _modulo
+
+    ldr R1,=actual
+    ldr R1,[R1]
+    ldr r0,=format
+    bl printf
+    POP {LR}
+    POP {R11}
+    MSR CPSR,r11
+    bx LR
+
+Potencia:
+    mrs r11,CPSR
+    PUSH {r11}
+    PUSH {LR}
+    bl solicitudValoresNumericos
+    ldr r0,=actual
+    ldr r0,[r0]
+    ldr r1,=strNumVal
+    ldr r1,[r1]
+    ldr r2,=actual
+    bl _potencia
+
+    ldr R1,=actual
+    ldr R1,[R1]
+    ldr r0,=format
+    bl printf
+    POP {LR}
+    POP {R11}
+    MSR CPSR,r11
+    bx LR
+
+Igual:
+    PUSH {LR}
+    ldr r1,=actual
+    ldr r1,[r1]
+    ldr r0,=format
+    bl printf
+    POP {LR}
+    bx LR
