@@ -46,7 +46,7 @@ endOfLine:
   ADD length,#1
   STR length,[R8]
   .unreq length
-  SWI 0
+  //SWI 0
   BX LR /*-- _strlen --*/
 
 .global _char2Num
@@ -68,24 +68,72 @@ _char2Num:
 
 .global _suma
 _suma:
-  valor1 .req r0
-  valor2 .req r1
-  respuesta .req r2
-  add valor1,valor2,valor1
-  str valor1,[respuesta]
-  .unreq valor1
-  .unreq valor2
-  .unreq respuesta
+  valor1s .req r0
+  valor2s .req r1
+  respuestas .req r2
+  add valor1s,valor2s
+  str valor1s,[respuestas]
+  .unreq valor1s
+  .unreq valor2s
+  .unreq respuestas
   BX LR
 
-/* 
 .global _multiplicacion
 _multiplicacion:
   valor1 .req r0
   valor2 .req r1
   respuesta .req r2
-  sub r2,r0,r1
+  pivote .req r5
+  contador .req R4
+  mov pivote,valor1
+  mov contador,#1
+  loop:
+    add valor1,pivote
+    add contador,#1
+    cmp contador,valor2
+    blt loop
+  str valor1,[respuesta]
   .unreq valor1
   .unreq valor2
   .unreq respuesta
-  BX LR*/
+  .unreq pivote
+  .unreq contador
+  BX LR
+
+.global _modulo
+_modulo:
+  valor1m .req r0
+  valor2m .req r1
+  respuestam .req r2
+  loop1:
+    sub valor1m,valor2m
+    cmp valor2m,valor1m
+    bge loop1
+  str valor1m,[respuestam]
+  .unreq valor1m
+  .unreq valor2m
+  .unreq respuestam
+  BX LR
+
+.global _potencia
+_potencia:
+  PUSH {LR}
+  valor1a .req r0
+  exponente .req r9
+  respuestaa .req r3
+  contadora .req R8
+  mov exponente,r1
+  mov contadora,#0
+  mov r1,valor1a
+  loop2:
+    bl Multiplicacion
+    add contadora,#1
+    cmp contadora,exponente
+    blt loop2
+  str valor1a,[respuesta]
+  .unreq respuestaa
+  .unreq contadora
+  .unreq valor1a
+  .unreq valor2a
+  POP {LR}
+  BX LR

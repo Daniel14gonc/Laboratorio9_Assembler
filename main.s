@@ -60,7 +60,7 @@ main:
         beq salida 
         
         cmp r0, #'+'
-        moveq r11,#1
+        //moveq r11,#1
 
         ldr r1, =msg1
         bleq _print
