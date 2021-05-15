@@ -7,6 +7,8 @@
 
 .data 
 .align 2
+bienvenida: .asciz "----------Bienvenidos a la calculadora----------\n"
+desp: .asciz "Gracias por utilizar la calculadora!\n"
 suma: .asciz "+ Suma \n"
 multip: .asciz "* Multiplicacion \n"
 modulo: .asciz "M Modulo \n"
@@ -41,7 +43,9 @@ opActual: .asciz " "
 .func main
 
 main:
-
+    ldr r1, =bienvenida
+    bl _print
+    
     loop:
         //Se modifica la bandera que indica si se ingreso un numero ascii o no.
         mov r1, #'b'
@@ -163,8 +167,11 @@ main:
 
         b loop
 
-    //Condiciones de salida
     salida:
+    ldr r1, =desp
+    bl _print
+
+    //Condiciones de salida
     mov r7,#1
     swi 0
 

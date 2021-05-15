@@ -14,7 +14,6 @@ numFinal: .word 0
 potencia: .word 0
 temporal: .word 0
 string: .asciz "                   "
-mensaje: .asciz "siuuuuuuuu\n"
 
 .text
 .align 2
